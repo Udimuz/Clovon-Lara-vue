@@ -17,6 +17,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/admin/dashboard', function () {
-    return view('dashboard');
-});
+//Route::get('/admin/dashboard', function () {
+//    return view('dashboard');
+//});
+
+Route::get('{view}', \App\Http\Controllers\ApplicationController::class)->where('view', '(.*)');
