@@ -3,26 +3,39 @@
 	import { ref, onMounted, reactive } from 'vue';
 	import { Form, Field } from 'vee-validate';
 	import * as yup from 'yup';
+
 	// const users1 = [{id: 1, name: 'John Doe', email: 'john@example.com'}, {id: 2, name: 'Dima Lazarev', email: 'dima@mail.com'}, ];
 	const users = ref([]);
-	const form = reactive({name: '', email: '', password: ''});
+	// const form = reactive({name: '', email: '', password: ''});
+	const editing = ref(false);
+	const formValues = ref();
+	const form = ref(null);
+
 	const getUsers = () => {
 		axios.get('/api/users')
 			.then((response) => {
 				users.value = response.data;
 			})
 	}
-	const schema = yup.object({
+	const createUserSchema = yup.object({
 		name: yup.string().required(),
 		email: yup.string().email().required(),
 		password: yup.string().required().min(6),
 	});
-	const createUser = (values, { resetForm}) => {
+	const editUserSchema = yup.object({
+		name: yup.string().required(),
+		email: yup.string().email().required(),
+		password: yup.string().when((password, schema) => {
+			//console.log(password);	// console.log("="+password+"=");
+			return password[0] ? schema.required().min(6) : schema;
+		}),
+	});
+	const createUser = (values, {resetForm}) => {
 		axios.post('/api/users', values)
 				.then((response) => {
 					users.value.push(response.data);	// Чтобы изменения сразу отобразились на экране, добавить данные в массив users
-					$('#createUserModal').modal('hide');
-					resetForm();
+					$('#userFormModal').modal('hide');
+					resetForm();	// Очисткой полей теперь занимается эта функция, требует добавления в аргументах
 				});
 	}
 	// const createUser = () => {
@@ -34,6 +47,43 @@
 	// 				$('#createUserModal').modal('hide');
 	// 			});
 	// }
+	const addUser = () => {
+		editing.value = false;
+		$('#userFormModal').modal('show');
+		formValues.value = {}		// Сам собрал, способ очищать данные формы, которые могут оставаться после редактирования данных
+	};
+	const editUser = (user) => {
+		editing.value = true;
+		form.value.resetForm();
+		$('#userFormModal').modal('show');
+		formValues.value = {
+			id: user.id,
+			name: user.name,
+			email: user.email,
+		};
+		// Можно и так, но это даёт лишние параметры:
+		//formValues.value = user;
+	};
+	const updateUser = (values) => {
+		axios.put('/api/users/' + formValues.value.id, values)
+				.then((response) => {
+					const index = users.value.findIndex(user => user.id === response.data.id);
+					users.value[index] = response.data;
+					$('#userFormModal').modal('hide');
+				}).catch((error) => {
+					//setErrors(error.response.data.errors);
+					console.log(error);
+				}).finally(() => {
+					form.value.resetForm();
+				});
+	}
+	const handleSubmit = (values) => {
+		if (editing.value)
+			updateUser(values)
+		else
+			createUser(values)
+	}
+
 	onMounted(() => {
 		getUsers();
 	});
@@ -61,7 +111,7 @@
 	<div class="content">
 		<div class="container-fluid">
 
-			<button type="button" class="mb-2 btn btn-primary" data-toggle="modal" data-target="#createUserModal"><i class="fa fa-plus-circle mr-2"></i>
+			<button @click="addUser" type="button" class="mb-2 btn btn-primary"><i class="fa fa-plus-circle mr-2"></i>
 				Add New User
 			</button>
 
@@ -87,7 +137,7 @@
 							<td>{{ user.email }}</td>
 							<td>-</td>
 							<td>-</td>
-							<td>-</td>
+							<td><a href="#" @click.prevent="editUser(user)"><i class="fa fa-edit"></i></a></td>
 						</tr>
 						</tbody>
 <!--						<tbody v-if="users.data.length > 0">
@@ -112,17 +162,21 @@
 
 
 	<!-- Модальная форма -->
-	<div class="modal fade" id="createUserModal" data-backdrop="static" tabindex="-1" role="dialog"
+	<div class="modal fade" id="userFormModal" data-backdrop="static" tabindex="-1" role="dialog"
 			 aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="staticBackdropLabel">Add New User</h5>
+					<h5 class="modal-title" id="staticBackdropLabel">
+						<span v-if="editing">Edit User</span>
+						<span v-else>Add New User</span>
+					</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<Form @submit="createUser" :validation-schema="schema" v-slot="{ errors }">
+				<Form ref="form" @submit="handleSubmit" :validation-schema="editing ? editUserSchema : createUserSchema"
+							v-slot="{ errors }" :initial-values="formValues">
 					<div class="modal-body">
 						<div class="form-group">
 							<label for="name">Name</label>
