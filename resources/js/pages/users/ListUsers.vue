@@ -1,17 +1,9 @@
 <script setup>
 	import axios from 'axios';
 	import { ref, onMounted, reactive } from 'vue';
-	// const users1 = [{
-	// 	id: 1,
-	// 	name: 'John Doe',
-	// 	email: 'john@example.com'
-	// },
-	// 	{
-	// 		id: 2,
-	// 		name: 'Dima Lazarev',
-	// 		email: 'dima@mail.com'
-	// 	},
-	// ];
+	import { Form, Field } from 'vee-validate';
+	import * as yup from 'yup';
+	// const users1 = [{id: 1, name: 'John Doe', email: 'john@example.com'}, {id: 2, name: 'Dima Lazarev', email: 'dima@mail.com'}, ];
 	const users = ref([]);
 	const form = reactive({name: '', email: '', password: ''});
 	const getUsers = () => {
@@ -20,15 +12,28 @@
 				users.value = response.data;
 			})
 	}
-	const createUser = () => {
-		axios.post('/api/users', form)
+	const schema = yup.object({
+		name: yup.string().required(),
+		email: yup.string().email().required(),
+		password: yup.string().required().min(6),
+	});
+	const createUser = (values, { resetForm}) => {
+		axios.post('/api/users', values)
 				.then((response) => {
-					// Чтобы изменения сразу отобразились на экране, добавить данные в массив users:
-					users.value.push(response.data);
-					form.name = ''; form.email = ''; form.password = '';
+					users.value.push(response.data);	// Чтобы изменения сразу отобразились на экране, добавить данные в массив users
 					$('#createUserModal').modal('hide');
+					resetForm();
 				});
 	}
+	// const createUser = () => {
+	// 	axios.post('/api/users', form)
+	// 			.then((response) => {
+	// 				// Чтобы изменения сразу отобразились на экране, добавить данные в массив users:
+	// 				users.value.push(response.data);
+	// 				form.name = ''; form.email = ''; form.password = '';
+	// 				$('#createUserModal').modal('hide');
+	// 			});
+	// }
 	onMounted(() => {
 		getUsers();
 	});
@@ -117,34 +122,37 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
+				<Form @submit="createUser" :validation-schema="schema" v-slot="{ errors }">
 					<div class="modal-body">
-						<form autocomplete="off">
 						<div class="form-group">
 							<label for="name">Name</label>
-							<input name="name" v-model="form.name" type="text" id="name" aria-describedby="nameHelp" placeholder="Enter full name" class="form-control"/>
+							<Field name="name" type="text" id="name" aria-describedby="nameHelp" :class="{ 'is-invalid': errors.name }" placeholder="Enter full name" class="form-control"/>
+							<span class="invalid-feedback">{{ errors.name }}</span>
 						</div>
 
 						<div class="form-group">
 							<label for="email">Email</label>
-							<input name="email" v-model="form.email" type="email" id="email" aria-describedby="nameHelp" placeholder="Enter full name" class="form-control"/>
+							<Field name="email" type="email" id="email" aria-describedby="nameHelp" :class="{ 'is-invalid': errors.email }" placeholder="Enter full name" class="form-control"/>
+							<span class="invalid-feedback">{{ errors.email }}</span>
 						</div>
 
 						<div class="form-group">
 							<label for="email">Password</label>
-							<input name="password" v-model="form.password" type="password" id="password" aria-describedby="nameHelp" placeholder="Enter password" class="form-control"/>
+							<Field name="password" type="password" id="password" aria-describedby="nameHelp" :class="{ 'is-invalid': errors.password }" placeholder="Enter password" class="form-control"/>
+							<span class="invalid-feedback">{{ errors.password }}</span>
 						</div>
 
-						</form>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button @click="createUser" type="submit" class="btn btn-primary">Save</button>
+						<button type="submit" class="btn btn-primary">Save</button>
 					</div>
+				</Form>
 			</div>
 		</div>
 	</div>
 
-	<div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
+<!--	<div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
 			 aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
@@ -165,7 +173,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div>-->
 
 
 </template>
