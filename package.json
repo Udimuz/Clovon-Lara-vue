@@ -12,6 +12,7 @@
     "dependencies": {
         "@vitejs/plugin-vue": "^4.0.0",
         "admin-lte": "3.2",
+        "jquery": "^3.6.3",
         "vue": "^3.2.47",
         "vue-router": "^4.1.6"
     }
