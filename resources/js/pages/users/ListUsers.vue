@@ -3,7 +3,9 @@
 	import { ref, onMounted, reactive } from 'vue';
 	import { Form, Field } from 'vee-validate';
 	import * as yup from 'yup';
+	import { useToastr } from '../../toastr.js';	//"@/toastr";
 
+	const toastr = useToastr();
 	// const users1 = [{id: 1, name: 'John Doe', email: 'john@example.com'}, {id: 2, name: 'Dima Lazarev', email: 'dima@mail.com'}, ];
 	const users = ref([]);
 	// const form = reactive({name: '', email: '', password: ''});
@@ -30,13 +32,19 @@
 			return password[0] ? schema.required().min(6) : schema;
 		}),
 	});
-	const createUser = (values, {resetForm}) => {
+	const createUser = (values, {resetForm, setErrors}) => {	// setFieldError
 		axios.post('/api/users', values)
 				.then((response) => {
 					users.value.push(response.data);	// Чтобы изменения сразу отобразились на экране, добавить данные в массив users
 					$('#userFormModal').modal('hide');
 					resetForm();	// Очисткой полей теперь занимается эта функция, требует добавления в аргументах
-				});
+					toastr.success('User created successfully');
+				})
+				.catch((error) => {
+					//setFieldError('email', error.response.data.errors.email[0]);	//	'error'
+					if (error.response.data.errors)
+						setErrors(error.response.data.errors);
+				})
 	}
 	// const createUser = () => {
 	// 	axios.post('/api/users', form)
@@ -64,28 +72,33 @@
 		// Можно и так, но это даёт лишние параметры:
 		//formValues.value = user;
 	};
-	const updateUser = (values) => {
+	const updateUser = (values, {setErrors}) => {
 		axios.put('/api/users/' + formValues.value.id, values)
 				.then((response) => {
 					const index = users.value.findIndex(user => user.id === response.data.id);
 					users.value[index] = response.data;
 					$('#userFormModal').modal('hide');
+					toastr.error('User update successfully');
 				}).catch((error) => {
-					//setErrors(error.response.data.errors);
+					setErrors(error.response.data.errors);
 					console.log(error);
-				}).finally(() => {
-					form.value.resetForm();
-				});
+				})
+				// Говорит, это больше не нужно:
+				// .finally(() => {
+				// 	form.value.resetForm();
+				// });
 	}
-	const handleSubmit = (values) => {
+	const handleSubmit = (values, actions) => {
+		// console.log(actions);
 		if (editing.value)
-			updateUser(values)
+			updateUser(values, actions)
 		else
-			createUser(values)
+			createUser(values, actions)
 	}
 
 	onMounted(() => {
 		getUsers();
+		toastr.info('Open list of Users');
 	});
 </script>
 

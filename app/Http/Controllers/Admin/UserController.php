@@ -16,6 +16,10 @@ class UserController extends Controller
 	}
 
 	public function store() {
+		request()->validate([
+			'email' => 'required|unique:users,email',
+			'name' => 'required|unique:users',	// Эту проверку уже сам добавил, на повтор имени
+		]);
 		return User::create([
 			'name' => request('name'),
 			'email' => request('email'),
@@ -24,6 +28,10 @@ class UserController extends Controller
 	}
 
 	public function update(User $user) {
+		request()->validate([
+			// Проверять также как при Добавлении данных, только при проверке на повторение не учитывать текущей записи:
+			'email' => 'required|unique:users,email,'.$user->id,
+		]);
 		$user->update([
 			'name' => request('name'),
 			'email' => request('email'),
