@@ -3,7 +3,8 @@
 	import { ref, onMounted, reactive } from 'vue';
 	import { Form, Field } from 'vee-validate';
 	import * as yup from 'yup';
-	import { useToastr } from '../../toastr.js';	//"@/toastr";
+	// import { useToastr } from '../../toastr.js';
+	import { useToastr } from "@/toastr";
 
 	const toastr = useToastr();
 	// const users1 = [{id: 1, name: 'John Doe', email: 'john@example.com'}, {id: 2, name: 'Dima Lazarev', email: 'dima@mail.com'}, ];
@@ -57,8 +58,11 @@
 	// }
 	const addUser = () => {
 		editing.value = false;
+		formValues.value = {}		// Сам собрал, способ очищать данные формы, которые могут оставаться после редактирования данных. Всё равно, не всегда очищает
+		//form.value.resetForm();
+		//form.name = ''; form.email = ''; form.password = '';
+		//formValues.value = { id: '', name: '', email: ''};
 		$('#userFormModal').modal('show');
-		formValues.value = {}		// Сам собрал, способ очищать данные формы, которые могут оставаться после редактирования данных
 	};
 	const editUser = (user) => {
 		editing.value = true;
@@ -69,7 +73,7 @@
 			name: user.name,
 			email: user.email,
 		};
-		// Можно и так, но это даёт лишние параметры:
+		// Можно и так, но это даёт лишние параметры: время создания и т.д.:
 		//formValues.value = user;
 	};
 	const updateUser = (values, {setErrors}) => {
@@ -78,15 +82,15 @@
 					const index = users.value.findIndex(user => user.id === response.data.id);
 					users.value[index] = response.data;
 					$('#userFormModal').modal('hide');
-					toastr.error('User update successfully');
+					toastr.success('User update successfully');
 				}).catch((error) => {
 					setErrors(error.response.data.errors);
 					console.log(error);
 				})
-				// Говорит, это больше не нужно:
-				// .finally(() => {
-				// 	form.value.resetForm();
-				// });
+				// Учитель зачем-то убрал это: Почему не надо, не пойму, без этого - данные не очищаются, и при нажатии "Add New User" показывает старые данные
+				.finally(() => {
+					form.value.resetForm();
+				});
 	}
 	const handleSubmit = (values, actions) => {
 		// console.log(actions);
@@ -95,6 +99,23 @@
 		else
 			createUser(values, actions)
 	}
+
+	const userIdBeingDeleted = ref(null);
+	const confirmUserDeletion = (user) => {
+		userIdBeingDeleted.value = user.id;
+		$('#deleteUserModal').modal('show');
+	};
+	const deleteUser = () => {
+		axios.delete(`/api/users/${userIdBeingDeleted.value}`)
+				.then(() => {
+					$('#deleteUserModal').modal('hide');
+					toastr.success('User deleted successfully!');
+					// В обучении на видео показывали так:
+					users.value = users.value.filter(user => user.id !== userIdBeingDeleted.value);
+					// А в коде Гитхаба так:
+					// users.value.data = users.value.data.filter(user => user.id !== userIdBeingDeleted.value);
+				})
+	};
 
 	onMounted(() => {
 		getUsers();
@@ -150,7 +171,10 @@
 							<td>{{ user.email }}</td>
 							<td>-</td>
 							<td>-</td>
-							<td><a href="#" @click.prevent="editUser(user)"><i class="fa fa-edit"></i></a></td>
+							<td>
+								<a href="#" @click.prevent="editUser(user)"><i class="fa fa-edit"></i></a>
+								<a href="#" @click.prevent="confirmUserDeletion(user)"><i class="fa fa-trash text-danger ml-2"></i></a>
+							</td>
 						</tr>
 						</tbody>
 <!--						<tbody v-if="users.data.length > 0">
@@ -204,7 +228,7 @@
 						</div>
 
 						<div class="form-group">
-							<label for="email">Password</label>
+							<label for="password">Password</label>
 							<Field name="password" type="password" id="password" aria-describedby="nameHelp" :class="{ 'is-invalid': errors.password }" placeholder="Enter password" class="form-control"/>
 							<span class="invalid-feedback">{{ errors.password }}</span>
 						</div>
@@ -219,7 +243,7 @@
 		</div>
 	</div>
 
-<!--	<div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
+	<div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
 			 aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
@@ -240,7 +264,7 @@
 				</div>
 			</div>
 		</div>
-	</div>-->
+	</div>
 
 
 </template>

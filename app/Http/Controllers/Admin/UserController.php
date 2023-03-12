@@ -19,6 +19,7 @@ class UserController extends Controller
 		request()->validate([
 			'email' => 'required|unique:users,email',
 			'name' => 'required|unique:users',	// Эту проверку уже сам добавил, на повтор имени
+			'password' => 'required|min:6'
 		]);
 		return User::create([
 			'name' => request('name'),
@@ -31,6 +32,8 @@ class UserController extends Controller
 		request()->validate([
 			// Проверять также как при Добавлении данных, только при проверке на повторение не учитывать текущей записи:
 			'email' => 'required|unique:users,email,'.$user->id,
+			'name' => 'required',
+			'password' => 'sometimes|min:6'
 		]);
 		$user->update([
 			'name' => request('name'),
@@ -38,5 +41,10 @@ class UserController extends Controller
 			'password' => request('password') ? bcrypt(request('password')) : $user->password,
 		]);
 		return $user;
+	}
+
+	public function destroy(User $user) {
+		$user->delete();
+		return response()->noContent();
 	}
 }

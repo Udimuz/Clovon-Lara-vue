@@ -17,6 +17,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//Route::get('/get-csrf-token', [\App\Http\Controllers\HomeController::class, 'getCSRFToken']);
+//Route::get('csrf', function() {
+//	return csrf_token();
+//});
+
 //Route::get('/admin/dashboard', function () {
 //    return view('dashboard');
 //});
@@ -24,5 +29,6 @@ Route::get('/', function () {
 Route::get('/api/users', [\App\Http\Controllers\Admin\UserController::class, 'index']);
 Route::post('/api/users', [\App\Http\Controllers\Admin\UserController::class, 'store']);
 Route::put('/api/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update']);
+Route::delete('/api/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy']);
 
 Route::get('{view}', \App\Http\Controllers\ApplicationController::class)->where('view', '(.*)');
