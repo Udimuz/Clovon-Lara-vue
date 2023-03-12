@@ -5,6 +5,7 @@
 	import * as yup from 'yup';
 	// import { useToastr } from '../../toastr.js';
 	import { useToastr } from "@/toastr";
+	import { formatDate } from '../../helper.js';
 
 	const toastr = useToastr();
 	// const users1 = [{id: 1, name: 'John Doe', email: 'john@example.com'}, {id: 2, name: 'Dima Lazarev', email: 'dima@mail.com'}, ];
@@ -169,7 +170,7 @@
 							<td>{{ user.id }}</td>
 							<td>{{ user.name }}</td>
 							<td>{{ user.email }}</td>
-							<td>-</td>
+							<td>{{ formatDate(user.created_at) }}</td>
 							<td>-</td>
 							<td>
 								<a href="#" @click.prevent="editUser(user)"><i class="fa fa-edit"></i></a>

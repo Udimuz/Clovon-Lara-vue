@@ -13,6 +13,15 @@ class UserController extends Controller
 //		return $users;
 		//return User::orderBy('id')->get();
 		return User::all()->sortBy("id");
+//		return User::all()->sortBy("id")->map(function($user){
+//			return [
+//				'id' => $user->id,
+//				'name' => $user->name,
+//				'email' => $user->email,
+//				// 'created_at' => $user->created_at->format(config('app.date_format')),
+//				'created_at' => $user->created_at->toFormattedDate(),
+//			];
+//		});
 	}
 
 	public function store() {
