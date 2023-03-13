@@ -6,21 +6,25 @@
 	// import { useToastr } from '../../toastr.js';
 	import { useToastr } from "@/toastr";
 	import { debounce } from 'lodash';
+	import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 
 	import UserListItem from './UserListItem.vue';
 
 	const toastr = useToastr();
 	// const users1 = [{id: 1, name: 'John Doe', email: 'john@example.com'}, {id: 2, name: 'Dima Lazarev', email: 'dima@mail.com'}, ];
-	const users = ref([]);
+	const users = ref({'data': []});	// ref([]);
 	// const form = reactive({name: '', email: '', password: ''});
 	const editing = ref(false);
 	const formValues = ref();
 	const form = ref(null);
 
-	const getUsers = () => {
-		axios.get('/api/users')
+	const getUsers = (page = 1) => {
+		if (searchQuery.value !== null)
+			return search(page);	// Таким образом я пытался исправить ошибку неработающей пагинации при поиске
+		axios.get(`/api/users?page=${page}`)
 			.then((response) => {
-				users.value = response.data;
+				users.value = response.data;	// users.value.data
+				//console.log(users.value.data);
 			})
 	}
 	const createUserSchema = yup.object({
@@ -39,6 +43,7 @@
 	const createUser = (values, {resetForm, setErrors}) => {	// setFieldError
 		axios.post('/api/users', values)
 				.then((response) => {
+					// console.log(response.data);
 					users.value.push(response.data);	// Чтобы изменения сразу отобразились на экране, добавить данные в массив users
 					$('#userFormModal').modal('hide');
 					resetForm();	// Очисткой полей теперь занимается эта функция, требует добавления в аргументах
@@ -132,10 +137,11 @@
 
 	const searchQuery = ref(null);
 
-	const search = () => {
+	const search = (page = 1) => {
 		axios.get('/api/users/search', {
 			params: {
-				query: searchQuery.value
+				query: searchQuery.value,
+				page: page
 			}
 		})
 		.then(response => {
@@ -202,8 +208,8 @@
 							<th>Options</th>
 						</tr>
 						</thead>
-						<tbody v-if="users.length > 0">
-							<UserListItem v-for="(user, index) in users"
+						<tbody v-if="users.data.length > 0">
+							<UserListItem v-for="(user, index) in users.data"
 														:key="user.id"
 														:user=user
 														:index=index
@@ -231,11 +237,12 @@
 					</table>
 				</div>
 			</div>
+			<Bootstrap4Pagination :data="users" @pagination-change-page="getUsers"/>
 		</div>
 	</div>
 
 
-	<!-- Модальная форма редактирования пользователя -->
+	<!-- Модальная форма добавления и редактирования пользователя -->
 	<div class="modal fade" id="userFormModal" data-backdrop="static" tabindex="-1" role="dialog"
 			 aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -280,7 +287,7 @@
 		</div>
 	</div>
 
-
+	<!-- Модальная форма удаления пользователя -->
 	<div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
 			 aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">

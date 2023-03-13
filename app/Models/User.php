@@ -55,8 +55,12 @@ class User extends Authenticatable
 
 	public function role(): Attribute
 	{
+//		if (isset($this->role))
+//			dd('--------'.$this->name." rollll:{$this->role}:");
+//		else
 		return Attribute::make(
 			get: fn ($value) => RoleType::from($value)->name,
+			//get: fn ($value) => !empty($value) ? RoleType::from($value)->name : 0,	// Тут неправильно, вообще надо было проверять на наличие цифры
 		);
 	}
 }

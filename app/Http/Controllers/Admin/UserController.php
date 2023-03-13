@@ -10,9 +10,13 @@ class UserController extends Controller
 {
     public function index() {
 //		$users = User::latest()->get();
+//		$users = User::latest()->paginate(3);
 //		return $users;
 		//return User::orderBy('id')->get();
-		return User::all()->sortBy("id");
+//		$users = User::all()->sortBy("id");
+		// dd($users[0]);
+		$users = User::orderBy('id', 'asc')->paginate(3);
+		return $users;
 //		return User::all()->sortBy("id")->map(function($user){
 //			return [
 //				'id' => $user->id,
@@ -30,11 +34,28 @@ class UserController extends Controller
 			'name' => 'required|unique:users',	// Эту проверку уже сам добавил, на повтор имени
 			'password' => 'required|min:6'
 		]);
+//		return User::create([
+//			'name' => request('name'),
+//			'email' => request('email'),
+//			'password' => bcrypt(request('password'))
+//		]);
+		//$user =  User::create([
 		return User::create([
 			'name' => request('name'),
 			'email' => request('email'),
-			'password' => bcrypt(request('password'))
+			'password' => bcrypt(request('password')),
+			'role' => 2		// При добавлении новой записи, потом не возвращает что вставилось, параметр из таблицы (что по умолчанию) не возвращает
+			// Приходится вручную указывать, чтобы по умолчанию выводил, как в базе указано, т.е. "USER"
 		]);
+//		dd($user->role);
+		//$user->role = 2;
+//		if (isset($user->role))
+//			dd("===");
+//		dd("=======-rollll:{$user->role}:");
+//		unset($user->role);
+//		$user->name = "Dima 222";
+		//dd($user->email_verified_at);
+		//return $user;
 	}
 
 	public function update(User $user) {
@@ -66,7 +87,9 @@ class UserController extends Controller
 
 	public function search() {
 		$searchQuery = request('query');
-		$users = User::where('name', 'like', "%{$searchQuery}%")->get();
+		// $users = User::where('name', 'like', "%{$searchQuery}%")->get();
+		$users = User::where('name', 'like', "%{$searchQuery}%")->paginate(3);
 		return response()->json($users);
 	}
+
 }
