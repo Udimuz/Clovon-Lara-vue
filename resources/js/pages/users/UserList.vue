@@ -5,7 +5,8 @@
 	import * as yup from 'yup';
 	// import { useToastr } from '../../toastr.js';
 	import { useToastr } from "@/toastr";
-	import { formatDate } from '../../helper.js';
+
+	import UserListItem from './UserListItem.vue';
 
 	const toastr = useToastr();
 	// const users1 = [{id: 1, name: 'John Doe', email: 'john@example.com'}, {id: 2, name: 'Dima Lazarev', email: 'dima@mail.com'}, ];
@@ -101,9 +102,13 @@
 			createUser(values, actions)
 	}
 
+	// const userDeleted = (userId) => {
+	// 	users.value = users.value.filter(user => user.id !== userId);
+	// };
+
 	const userIdBeingDeleted = ref(null);
-	const confirmUserDeletion = (user) => {
-		userIdBeingDeleted.value = user.id;
+	const confirmUserDeletion = (id) => {
+		userIdBeingDeleted.value = id;
 		$('#deleteUserModal').modal('show');
 	};
 	const deleteUser = () => {
@@ -115,8 +120,12 @@
 					users.value = users.value.filter(user => user.id !== userIdBeingDeleted.value);
 					// А в коде Гитхаба так:
 					// users.value.data = users.value.data.filter(user => user.id !== userIdBeingDeleted.value);
+					// emit('userDeleted', userIdBeingDeleted.value)
 				})
 	};
+	// const editUser = (user) => {
+	// 	emit('editUser', user)
+	// };
 
 	onMounted(() => {
 		getUsers();
@@ -164,25 +173,20 @@
 							<th>Options</th>
 						</tr>
 						</thead>
-						<tbody>
-						<tr v-if="users.length > 0" v-for="(user, index) in users" :key="user.id">
-							<td>{{ index + 1 }}</td>
-							<td>{{ user.id }}</td>
-							<td>{{ user.name }}</td>
-							<td>{{ user.email }}</td>
-							<td>{{ formatDate(user.created_at) }}</td>
-							<td>{{ user.role }}</td>
-							<td>
-								<a href="#" @click.prevent="editUser(user)"><i class="fa fa-edit"></i></a>
-								<a href="#" @click.prevent="confirmUserDeletion(user)"><i class="fa fa-trash text-danger ml-2"></i></a>
-							</td>
-						</tr>
+						<tbody v-if="users.length > 0">
+							<UserListItem v-for="(user, index) in users"
+														:key="user.id"
+														:user=user
+														:index=index
+														@edit-user="editUser"
+														@confirm-user-deletion="confirmUserDeletion"
+							/>
 						</tbody>
 <!--						<tbody v-if="users.data.length > 0">
 						<UserListItem v-for="(user, index) in users.data"
 													:key="user.id"
 													:user=user :index=index
-													@edit-user="editUser"
+													@edit-user="editUser"		@user-deleted="userDeleted"
 													@confirm-user-deletion="confirmUserDeletion"
 													@toggle-selection="toggleSelection"
 													:select-all="selectAll" />
@@ -199,7 +203,7 @@
 	</div>
 
 
-	<!-- Модальная форма -->
+	<!-- Модальная форма редактирования пользователя -->
 	<div class="modal fade" id="userFormModal" data-backdrop="static" tabindex="-1" role="dialog"
 			 aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -244,6 +248,7 @@
 		</div>
 	</div>
 
+
 	<div class="modal fade" id="deleteUserModal" data-backdrop="static" tabindex="-1" role="dialog"
 			 aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -266,6 +271,7 @@
 			</div>
 		</div>
 	</div>
+
 
 
 </template>
