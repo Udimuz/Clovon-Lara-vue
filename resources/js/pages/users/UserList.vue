@@ -107,6 +107,7 @@
 	// };
 
 	const userIdBeingDeleted = ref(null);
+
 	const confirmUserDeletion = (id) => {
 		userIdBeingDeleted.value = id;
 		$('#deleteUserModal').modal('show');
