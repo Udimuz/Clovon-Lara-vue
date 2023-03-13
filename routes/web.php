@@ -28,6 +28,7 @@ Route::get('/', function () {
 
 Route::get('/api/users', [\App\Http\Controllers\Admin\UserController::class, 'index']);
 Route::post('/api/users', [\App\Http\Controllers\Admin\UserController::class, 'store']);
+Route::get('/api/users/search', [\App\Http\Controllers\Admin\UserController::class, 'search']);
 Route::patch('/api/users/{user}/change-role', [\App\Http\Controllers\Admin\UserController::class, 'changeRole']);
 Route::put('/api/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update']);
 Route::delete('/api/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy']);

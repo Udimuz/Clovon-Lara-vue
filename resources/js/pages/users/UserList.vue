@@ -1,10 +1,11 @@
 <script setup>
 	import axios from 'axios';
-	import { ref, onMounted, reactive } from 'vue';
+	import { ref, onMounted, reactive, watch } from 'vue';
 	import { Form, Field } from 'vee-validate';
 	import * as yup from 'yup';
 	// import { useToastr } from '../../toastr.js';
 	import { useToastr } from "@/toastr";
+	import { debounce } from 'lodash';
 
 	import UserListItem from './UserListItem.vue';
 
@@ -94,13 +95,6 @@
 					form.value.resetForm();
 				});
 	}
-	const handleSubmit = (values, actions) => {
-		// console.log(actions);
-		if (editing.value)
-			updateUser(values, actions)
-		else
-			createUser(values, actions)
-	}
 
 	// const userDeleted = (userId) => {
 	// 	users.value = users.value.filter(user => user.id !== userId);
@@ -127,6 +121,34 @@
 	// const editUser = (user) => {
 	// 	emit('editUser', user)
 	// };
+
+	const handleSubmit = (values, actions) => {
+		// console.log(actions);
+		if (editing.value)
+			updateUser(values, actions)
+		else
+			createUser(values, actions)
+	}
+
+	const searchQuery = ref(null);
+
+	const search = () => {
+		axios.get('/api/users/search', {
+			params: {
+				query: searchQuery.value
+			}
+		})
+		.then(response => {
+			users.value = response.data;
+		})
+		.catch(error => {
+			console.log(error);
+		})
+	};
+
+	watch(searchQuery, debounce(() => {
+		search();
+	}, 300));
 
 	onMounted(() => {
 		getUsers();
@@ -156,9 +178,15 @@
 	<div class="content">
 		<div class="container-fluid">
 
-			<button @click="addUser" type="button" class="mb-2 btn btn-primary"><i class="fa fa-plus-circle mr-2"></i>
-				Add New User
-			</button>
+
+			<div class="d-flex justify-content-between">
+				<div class="d-flex">
+					<button @click="addUser" type="button" class="mb-2 btn btn-primary"><i class="fa fa-plus-circle mr-2"></i>
+						Add New User
+					</button>
+				</div>
+				<div><input type="text" v-model="searchQuery" class="form-control" placeholder="Поиск по имени..." /></div>
+			</div>
 
 			<div class="card">
 				<div class="card-body">
@@ -182,6 +210,9 @@
 														@edit-user="editUser"
 														@confirm-user-deletion="confirmUserDeletion"
 							/>
+						</tbody>
+						<tbody v-else>
+							<tr><td colspan="7" class="text-center">Ничего не найдено..</td></tr>
 						</tbody>
 <!--						<tbody v-if="users.data.length > 0">
 						<UserListItem v-for="(user, index) in users.data"
