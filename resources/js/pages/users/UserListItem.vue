@@ -6,10 +6,10 @@
 
 	const toastr = useToastr();
 
-	//const props =
-			defineProps({
+	const props = defineProps({
 		user: Object,
 		index: Number,
+		selectAll: Boolean,
 	});
 	const emit = defineEmits(['editUser', 'confirmUserDeletion']);	// 'userDeleted'
 
@@ -37,10 +37,15 @@
 			toastr.success('Role changed successfully!');
 		})
 	};
+
+	const toggleSelection = () => {
+		emit('toggleSelection', props.user);
+	}
 </script>
 
 <template>
 	<tr>
+		<td style="width:20px"><input type="checkbox" :checked="selectAll" @change="toggleSelection"/></td>
 		<td>{{ index + 1 }}</td>
 		<td>{{ user.id }}</td>
 		<td>{{ user.name }}</td>

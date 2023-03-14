@@ -25,6 +25,8 @@
 			.then((response) => {
 				users.value = response.data;	// users.value.data
 				//console.log(users.value.data);
+				selectedUsers.value = [];
+				selectAll.value = false;
 			})
 	}
 	const createUserSchema = yup.object({
@@ -156,6 +158,42 @@
 		search();
 	}, 300));
 
+	const selectedUsers = ref([]);
+	const toggleSelection = (user) => {
+		const index = selectedUsers.value.indexOf(user.id);
+		if (index === -1) {
+			selectedUsers.value.push(user.id);
+		} else {
+			selectedUsers.value.splice(index, 1);
+		}
+		console.log(selectedUsers.value.length);	//console.log(selectedUsers.value);
+	};
+
+	const bulkDelete = () => {
+		axios.delete('/api/users', {
+			data: {
+				ids: selectedUsers.value
+			}
+		})
+				.then(response => {
+					users.value.data = users.value.data.filter(user => !selectedUsers.value.includes(user.id));
+					selectedUsers.value = [];
+					selectAll.value = false;
+					toastr.success(response.data.message);
+				});
+	};
+
+	const selectAll = ref(false);
+	const selectAllUsers = () => {
+		if (selectAll.value) {
+			selectedUsers.value = users.value.data.map(user => user.id);
+		} else {
+			selectedUsers.value = [];
+		}
+		console.log(selectAll.value);
+		console.log(selectedUsers.value.length);
+	}
+
 	onMounted(() => {
 		getUsers();
 		toastr.info('Open list of Users');
@@ -190,6 +228,14 @@
 					<button @click="addUser" type="button" class="mb-2 btn btn-primary"><i class="fa fa-plus-circle mr-2"></i>
 						Add New User
 					</button>
+
+					<div v-if="selectedUsers.length > 0">
+						<button @click="bulkDelete" type="button" class="mb-2 ml-4 btn btn-danger"><i class="fa fa-trash mr-1"></i>
+							Delete selected
+						</button>
+						<span class="ml-4">Selected <b>{{ selectedUsers.length }}</b> users</span>
+					</div>
+
 				</div>
 				<div><input type="text" v-model="searchQuery" class="form-control" placeholder="Поиск по имени..." /></div>
 			</div>
@@ -199,6 +245,7 @@
 					<table class="table table-bordered">
 						<thead>
 						<tr>
+							<th style="width:20px"><input type="checkbox" v-model="selectAll" @change="selectAllUsers"/></th>
 							<th style="width:20px">№</th>
 							<th style="width:20px">ID</th>
 							<th>Name</th>
@@ -215,6 +262,8 @@
 														:index=index
 														@edit-user="editUser"
 														@confirm-user-deletion="confirmUserDeletion"
+														@toggle-selection="toggleSelection"
+														:select-all="selectAll"
 							/>
 						</tbody>
 						<tbody v-else>

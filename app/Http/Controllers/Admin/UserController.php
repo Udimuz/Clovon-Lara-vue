@@ -15,7 +15,7 @@ class UserController extends Controller
 		//return User::orderBy('id')->get();
 //		$users = User::all()->sortBy("id");
 		// dd($users[0]);
-		$users = User::orderBy('id', 'asc')->paginate(3);
+		$users = User::orderBy('id', 'asc')->paginate(10);
 		return $users;
 //		return User::all()->sortBy("id")->map(function($user){
 //			return [
@@ -92,4 +92,9 @@ class UserController extends Controller
 		return response()->json($users);
 	}
 
+	public function bulkDelete() {
+//		dd(request('ids'));
+		User::whereIn('id', request('ids'))->delete();
+		return response()->json(['message' => 'Users deleted successfully']);
+	}
 }

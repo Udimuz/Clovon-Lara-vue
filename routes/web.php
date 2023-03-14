@@ -32,5 +32,6 @@ Route::get('/api/users/search', [\App\Http\Controllers\Admin\UserController::cla
 Route::patch('/api/users/{user}/change-role', [\App\Http\Controllers\Admin\UserController::class, 'changeRole']);
 Route::put('/api/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update']);
 Route::delete('/api/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy']);
+Route::delete('/api/users', [\App\Http\Controllers\Admin\UserController::class, 'bulkDelete']);
 
 Route::get('{view}', \App\Http\Controllers\ApplicationController::class)->where('view', '(.*)');
