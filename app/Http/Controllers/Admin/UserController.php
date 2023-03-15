@@ -34,11 +34,6 @@ class UserController extends Controller
 			'name' => 'required|unique:users',	// Эту проверку уже сам добавил, на повтор имени
 			'password' => 'required|min:6'
 		]);
-//		return User::create([
-//			'name' => request('name'),
-//			'email' => request('email'),
-//			'password' => bcrypt(request('password'))
-//		]);
 		//$user =  User::create([
 		return User::create([
 			'name' => request('name'),

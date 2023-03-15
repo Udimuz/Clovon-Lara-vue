@@ -46,7 +46,7 @@
 		axios.post('/api/users', values)
 				.then((response) => {
 					// console.log(response.data);
-					users.value.push(response.data);	// Чтобы изменения сразу отобразились на экране, добавить данные в массив users
+					users.value.data.push(response.data);	// Чтобы изменения сразу отобразились на экране, добавить данные в массив users
 					$('#userFormModal').modal('hide');
 					resetForm();	// Очисткой полей теперь занимается эта функция, требует добавления в аргументах
 					toastr.success('User created successfully');
@@ -269,20 +269,6 @@
 						<tbody v-else>
 							<tr><td colspan="7" class="text-center">Ничего не найдено..</td></tr>
 						</tbody>
-<!--						<tbody v-if="users.data.length > 0">
-						<UserListItem v-for="(user, index) in users.data"
-													:key="user.id"
-													:user=user :index=index
-													@edit-user="editUser"		@user-deleted="userDeleted"
-													@confirm-user-deletion="confirmUserDeletion"
-													@toggle-selection="toggleSelection"
-													:select-all="selectAll" />
-						</tbody>
-						<tbody v-else>
-						<tr>
-							<td colspan="6" class="text-center">No results found...</td>
-						</tr>
-						</tbody>-->
 					</table>
 				</div>
 			</div>
