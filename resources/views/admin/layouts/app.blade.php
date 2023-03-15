@@ -185,7 +185,7 @@
                     <li class="nav-item">
                         <router-link to="/admin/users" active-class="active" class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
-                            <p>Users</p>
+                            <p>Пользователи</p>
                         </router-link>
                     </li>
 

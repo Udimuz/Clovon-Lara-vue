@@ -34,4 +34,8 @@ Route::put('/api/users/{user}', [\App\Http\Controllers\Admin\UserController::cla
 Route::delete('/api/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy']);
 Route::delete('/api/users', [\App\Http\Controllers\Admin\UserController::class, 'bulkDelete']);
 
+Route::get('/api/appointments', [\App\Http\Controllers\Admin\AppointmentsController::class, 'index']);
+
+
+// Важно: этот маршрут должен быть ниже всех, последним
 Route::get('{view}', \App\Http\Controllers\ApplicationController::class)->where('view', '(.*)');

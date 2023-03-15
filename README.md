@@ -1,13 +1,13 @@
 ## Laravel
 
-### Laravel + VueJS. SPA. Аналог Trello
+### Laravel 9 + Vue 3. Multi-Purpose
 
 #### Установлено:
     - Laravel 10
     - Vue
     - Axios
     - AdminLTE
-    - vue-router
+    - Vue-router
     - Vitejs
     - Jquery
     - Carbone
@@ -27,7 +27,8 @@
     <li>13. Преобразование даты (4 способа)</li>
     <li>17. Роли пользователей</li>
     <li>18. Поиск по имени</li>
-    <li>19. Навигация по страницам. Pagination</li>
+    <li>19. Навигация по страницам: Pagination</li>
     <li>20. Множественная выборка</li>
     <li>Подключаемся к Github</li>
+    <li>Страница задач Appointment</li>
 </ul>
