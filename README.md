@@ -31,4 +31,5 @@
     <li>20. Множественная выборка</li>
     <li>Подключаемся к Github</li>
     <li>Страница задач Appointment</li>
+    <li>Фильтры для страницы Appointment</li>
 </ul>

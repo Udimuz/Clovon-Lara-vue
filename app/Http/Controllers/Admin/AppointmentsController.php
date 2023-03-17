@@ -12,6 +12,9 @@ class AppointmentsController extends Controller
 	{
 		return Appointment::query()
 			->with('client:id,first_name,last_name,email')
+			->when(request('status'), function ($query) {
+				return $query->where('status', \App\Enums\AppointmentStatus::from(request('status')));
+			})
 			->latest()
 			->paginate()
 			// Для преобразования (форматирования) данных добавили такую конструкцию:
