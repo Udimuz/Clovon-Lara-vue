@@ -16,7 +16,7 @@ class AppointmentsController extends Controller
 				return $query->where('status', \App\Enums\AppointmentStatus::from(request('status')));
 			})
 			->latest()
-			->paginate()
+			->paginate(20)
 			// Для преобразования (форматирования) данных добавили такую конструкцию:
 			->through(fn ($appoinment) => [
 				'id' => $appoinment->id,
