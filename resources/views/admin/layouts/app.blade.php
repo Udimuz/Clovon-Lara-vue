@@ -161,7 +161,7 @@
                     <img src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">Alexander Pierce</a>
+                    <a href="#" class="d-block">Damayita Das</a>
                 </div>
             </div>
 
@@ -170,43 +170,37 @@
 
                     <li class="nav-item">
                         <router-link to="/admin/dashboard" active-class="active" class="nav-link">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Dashboard</p>
+                            <i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p>
                         </router-link>
                     </li>
 
                     <li class="nav-item">
-                        <router-link to="/admin/appointments" active-class="active" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                            <p>Appointments</p>
+                        <router-link to="/admin/appointments" :class="$route.path.startsWith('/admin/appointments') ? 'active' : ''" class="nav-link">
+                            <i class="nav-icon fas fa-calendar-alt"></i><p>Appointments</p>
                         </router-link>
                     </li>
 
                     <li class="nav-item">
                         <router-link to="/admin/users" active-class="active" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Пользователи</p>
+                            <i class="nav-icon fas fa-users"></i><p>Пользователи</p>
                         </router-link>
                     </li>
 
                     <li class="nav-item">
                         <router-link to="/admin/settings" active-class="active" class="nav-link">
-                            <i class="nav-icon fas fa-cog"></i>
-                            <p>Settings</p>
+                            <i class="nav-icon fas fa-cog"></i><p>Settings</p>
                         </router-link>
                     </li>
 
                     <li class="nav-item">
                         <router-link to="/admin/profile" active-class="active" class="nav-link">
-                            <i class="nav-icon fas fa-user"></i>
-                            <p>Profile</p>
+                            <i class="nav-icon fas fa-user"></i><p>Profile</p>
                         </router-link>
                     </li>
 
                     <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>Logout</p>
+                            <i class="nav-icon fas fa-sign-out-alt"></i><p>Logout</p>
                         </a>
                     </li>
 

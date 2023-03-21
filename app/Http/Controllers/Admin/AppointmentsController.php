@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AppointmentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
@@ -30,4 +31,17 @@ class AppointmentsController extends Controller
 				'client' => $appoinment->client,
 			]);
     }
+
+	public function store()
+	{
+		Appointment::create([
+			'title' => request('title'),
+			'client_id' => 12,
+			'start_time' => now(),
+			'end_time' => now(),
+			'description' => request('description'),
+			'status' => AppointmentStatus::CONFIRMED,	// SCHEDULED
+		]);
+		return response()->json(['message' => 'Create success']);
+	}
 }

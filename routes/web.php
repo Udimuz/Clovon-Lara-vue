@@ -36,7 +36,7 @@ Route::delete('/api/users', [\App\Http\Controllers\Admin\UserController::class, 
 
 Route::get('/api/appointment-status', [\App\Http\Controllers\Admin\AppointmentStatusController::class, 'getStatusWithCount']);
 Route::get('/api/appointments', [\App\Http\Controllers\Admin\AppointmentsController::class, 'index']);
-
+Route::post('/api/appointments/create', [\App\Http\Controllers\Admin\AppointmentsController::class, 'store']);
 
 
 // Важно: этот маршрут должен быть ниже всех, последним

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Appointment extends Model
 {
     use HasFactory;
+	protected $guarded = [];
 
 	// Для преобразования (форматирования) данных:
 	protected $casts = [

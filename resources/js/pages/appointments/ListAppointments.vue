@@ -11,6 +11,9 @@
 				.then((response) => {
 					appointmentStatus.value = response.data;
 				})
+				.finally(() => {
+					toastr.info('Open list of Appointments ('+appointmentCount.value+')');
+				});
 	};
 	//const appointmentStatus = {'scheduled': 1, 'confirmed': 2, 'cancelled': 3};
 	const appointments = ref([]);
@@ -40,8 +43,8 @@
 
 	onMounted(() => {
 		getAppointments();
-		toastr.info('Open list of Appointments');
 		getAppointmentStatus();
+		//toastr.info('Open list of Appointments');
 	});
 </script>
 
@@ -71,10 +74,9 @@
 				<div class="col-lg-12">
 					<div class="d-flex justify-content-between mb-2">
 						<div>
-							<a href="">
-								<button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New
-									Appointment</button>
-							</a>
+							<router-link to="/admin/appointments/create">
+								<button class="btn btn-primary"><i class="fa fa-plus-circle mr-1"></i> Add New Appointment</button>
+							</router-link>
 						</div>
 						<div class="btn-group">
 							<button @click="getAppointments()" type="button"
@@ -106,6 +108,7 @@
 								<thead>
 								<tr>
 									<th scope="col">№</th>
+									<th scope="col">ID</th>
 									<th scope="col">Client Name</th>
 									<th scope="col">Date</th>
 									<th scope="col">Time</th>
@@ -116,6 +119,7 @@
 								<tbody>
 								<tr v-for="(appointment, index) in appointments.data" :key="appointment.id">
 									<td>{{ index + 1 }}</td>
+									<td>{{ appointment.id }}</td>
 									<td>{{appointment.client.first_name}} {{appointment.client.last_name}}</td>
 									<td>{{appointment.start_time}}</td>
 									<td>{{appointment.end_time}}</td>
