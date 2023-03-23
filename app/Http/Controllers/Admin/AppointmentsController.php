@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 
 class AppointmentsController extends Controller
 {
-	public function index()
-	{
-		return Appointment::query()
+	public function index() {
+		$result = Appointment::query()
 			->with('client:id,first_name,last_name,email')
 			->when(request('status'), function ($query) {
 				return $query->where('status', \App\Enums\AppointmentStatus::from(request('status')));
 			})
-			->latest()
+			//->latest()
+			->orderBy('id', 'desc')
 			->paginate(20)
 			// Для преобразования (форматирования) данных добавили такую конструкцию:
 			->through(fn ($appoinment) => [
@@ -30,16 +30,27 @@ class AppointmentsController extends Controller
 				],
 				'client' => $appoinment->client,
 			]);
+//		$sortedResult = $result->getCollection()->sortByDesc('id')->values();
+//		$result->setCollection($sortedResult);
+		return $result;
     }
 
-	public function store()
-	{
+	public function store() {
+		$validated = request()->validate([
+			'client_id' => 'required',
+			'title' => 'required',
+			'description' => 'required',
+			'start_time' => 'required',
+			'end_time' => 'required',
+		], [
+			'client_id' => 'Необходимо выбрать клиента',
+		]);
 		Appointment::create([
-			'title' => request('title'),
-			'client_id' => 12,
-			'start_time' => now(),
-			'end_time' => now(),
-			'description' => request('description'),
+			'title' => $validated['title'], //request('title'),
+			'client_id' => $validated['client_id'], //12,
+			'start_time' => $validated['start_time'], //now(),
+			'end_time' => $validated['start_time'], //now(),
+			'description' => $validated['description'], //request('description'),
 			'status' => AppointmentStatus::CONFIRMED,	// SCHEDULED
 		]);
 		return response()->json(['message' => 'Create success']);
