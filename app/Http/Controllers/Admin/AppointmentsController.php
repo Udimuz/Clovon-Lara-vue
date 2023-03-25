@@ -51,7 +51,7 @@ class AppointmentsController extends Controller
 			'title' => $validated['title'], //request('title'),
 			'client_id' => $validated['client_id'], //12,
 			'start_time' => $validated['start_time'], //now(),
-			'end_time' => $validated['start_time'], //now(),
+			'end_time' => $validated['end_time'], //now(),
 			'description' => $validated['description'], //request('description'),
 			'status' => $validated['status'],	// AppointmentStatus::CANCELLED SCHEDULED CONFIRMED
 		]);
@@ -77,5 +77,11 @@ class AppointmentsController extends Controller
 		]);
 		$appointment->update($validated);
 		return response()->json(['success' => true]);
+	}
+
+	public function destroy(Appointment $appointment)
+	{
+		$appointment->delete();
+		return response()->json(['success' => true], 200);
 	}
 }

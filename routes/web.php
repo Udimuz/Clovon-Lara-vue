@@ -42,6 +42,7 @@ Route::get('/api/appointments', [\App\Http\Controllers\Admin\AppointmentsControl
 Route::post('/api/appointments/create', [\App\Http\Controllers\Admin\AppointmentsController::class, 'store']);
 Route::get('/api/appointments/{appointment}/edit', [\App\Http\Controllers\Admin\AppointmentsController::class, 'edit']);
 Route::put('/api/appointments/{appointment}/edit', [\App\Http\Controllers\Admin\AppointmentsController::class, 'update']);
+Route::delete('/api/appointments/{appointment}', [\App\Http\Controllers\Admin\AppointmentsController::class, 'destroy']);
 
 // Важно: этот маршрут должен быть ниже всех, последним
 Route::get('{view}', \App\Http\Controllers\ApplicationController::class)->where('view', '(.*)');
