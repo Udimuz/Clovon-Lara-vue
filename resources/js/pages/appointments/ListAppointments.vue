@@ -30,11 +30,11 @@
 			// toastr.success(appointmentStatus.value[status-1].name);
 		}
 		axios.get('/api/appointments', {
-							params: params,
-						})
-						.then((response) => {
-							appointments.value = response.data;
-						})
+			params: params,
+		})
+			.then((response) => {
+				appointments.value = response.data;
+			})
 	}
 
 	const appointmentCount = computed(() => {
@@ -109,6 +109,7 @@
 								<tr>
 									<th scope="col">№</th>
 									<th scope="col">ID</th>
+									<th scope="col">Title</th>
 									<th scope="col">Client Name</th>
 									<th scope="col">Date</th>
 									<th scope="col">Time</th>
@@ -120,6 +121,7 @@
 								<tr v-for="(appointment, index) in appointments.data" :key="appointment.id">
 									<td>{{ index + 1 }}</td>
 									<td>{{ appointment.id }}</td>
+									<td>{{ appointment.title }}</td>
 									<td>{{appointment.client.first_name}} {{appointment.client.last_name}}</td>
 									<td>{{appointment.start_time}}</td>
 									<td>{{appointment.end_time}}</td>
@@ -127,7 +129,7 @@
 										<span class="badge" :class="`badge-${appointment.status.color}`">{{appointment.status.name}}</span>
 									</td>
 									<td>
-										<a href=""><i class="fa fa-edit mr-2"></i></a>
+										<router-link :to="`/admin/appointments/${appointment.id}/edit`"><i class="fa fa-edit mr-2"></i></router-link>
 										<a href=""><i class="fa fa-trash text-danger"></i></a>
 									</td>
 								</tr>

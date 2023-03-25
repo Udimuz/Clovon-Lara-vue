@@ -21,8 +21,9 @@ class AppointmentsController extends Controller
 			// Для преобразования (форматирования) данных добавили такую конструкцию:
 			->through(fn ($appoinment) => [
 				'id' => $appoinment->id,
-				'start_time' => $appoinment->start_time->format('d.m.Y h:i A'),
-				'end_time' => $appoinment->end_time->format('d.m.Y h:i A'),
+				'title' => $appoinment->title,
+				'start_time' => $appoinment->start_time->format('d-m-Y H:i'),	//	'd.m.Y h:i A'
+				'end_time' => $appoinment->end_time->format('d-m-Y H:i'),
 				// 'status' => $appoinment->status,
 				'status' => [
 					'name' => $appoinment->status->name,
@@ -42,6 +43,7 @@ class AppointmentsController extends Controller
 			'description' => 'required',
 			'start_time' => 'required',
 			'end_time' => 'required',
+			'status' => 'required',
 		], [
 			'client_id' => 'Необходимо выбрать клиента',
 		]);
@@ -51,8 +53,29 @@ class AppointmentsController extends Controller
 			'start_time' => $validated['start_time'], //now(),
 			'end_time' => $validated['start_time'], //now(),
 			'description' => $validated['description'], //request('description'),
-			'status' => AppointmentStatus::CONFIRMED,	// SCHEDULED
+			'status' => $validated['status'],	// AppointmentStatus::CANCELLED SCHEDULED CONFIRMED
 		]);
 		return response()->json(['message' => 'Create success']);
+	}
+
+	public function edit(Appointment $appointment)
+	{
+		return $appointment;
+	}
+
+	public function update(Appointment $appointment)
+	{
+		$validated = request()->validate([
+			'client_id' => 'required',
+			'title' => 'required',
+			'description' => 'required',
+			'start_time' => 'required',
+			'end_time' => 'required',
+			'status' => 'required',
+		], [
+			'client_id.required' => 'Необходимо выбрать клиента',
+		]);
+		$appointment->update($validated);
+		return response()->json(['success' => true]);
 	}
 }
