@@ -17,11 +17,19 @@
 	const editing = ref(false);
 	const formValues = ref();
 	const form = ref(null);
+	const searchQuery = ref(null);
 
 	const getUsers = (page = 1) => {
-		if (searchQuery.value !== null)
-			return search(page);	// Таким образом я пытался исправить ошибку неработающей пагинации при поиске
-		axios.get(`/api/users?page=${page}`)
+		// if (searchQuery.value !== null)
+		// 	return search(page);	// Таким образом я пытался исправить ошибку неработающей пагинации при поиске
+		//if (searchQuery.value !== null)		console.log("<"+searchQuery.value+">");
+		//if (searchQuery.value !== ''  &&  searchQuery.value !== null)		console.log(">"+searchQuery.value+"<");
+		//console.log(page);
+		axios.get(`/api/users?page=${page}`, {	// Способ исправления пагинации, добавленный учителем:
+			params: {
+				query: searchQuery.value,
+			}
+		})
 			.then((response) => {
 				users.value = response.data;	// users.value.data
 				//console.log(users.value.data);
@@ -137,25 +145,24 @@
 			createUser(values, actions)
 	}
 
-	const searchQuery = ref(null);
-
-	const search = (page = 1) => {
-		axios.get('/api/users/search', {
-			params: {
-				query: searchQuery.value,
-				page: page
-			}
-		})
-		.then(response => {
-			users.value = response.data;
-		})
-		.catch(error => {
-			console.log(error);
-		})
-	};
+	// const search = (page = 1) => {
+	// 	axios.get('/api/users/search', {
+	// 		params: {
+	// 			query: searchQuery.value,
+	// 			page: page
+	// 		}
+	// 	})
+	// 	.then(response => {
+	// 		users.value = response.data;
+	// 	})
+	// 	.catch(error => {
+	// 		console.log(error);
+	// 	})
+	// };
 
 	watch(searchQuery, debounce(() => {
-		search();
+		//search();
+		getUsers();
 	}, 300));
 
 	const selectedUsers = ref([]);

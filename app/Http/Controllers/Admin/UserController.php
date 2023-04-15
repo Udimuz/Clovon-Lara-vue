@@ -10,12 +10,26 @@ class UserController extends Controller
 {
     public function index() {
 //		$users = User::latest()->get();
-//		$users = User::latest()->paginate(3);
+//		$users = User::latest()->paginate(3);	// <<-- Учитель использовал долгое время такую выборку, но latest() неправильно сортирует, если данные изменялись
 //		return $users;
 		//return User::orderBy('id')->get();
 //		$users = User::all()->sortBy("id");
-		// dd($users[0]);
-		$users = User::orderBy('id', 'asc')->paginate(10);
+
+		$searchQuery = request('query');
+		// $users = User::where('name', 'like', "%{$searchQuery}%")->get();
+		//$users = User::where('name', 'like', "%{$searchQuery}%")->paginate(3);
+		$users = User::query()
+				->when($searchQuery, function($query, $searchQuery){	// when(request('query')
+					$query->where('name', 'like', "%{$searchQuery}%");
+					//dd(">>>".request('query'));
+				})
+				->orderBy('id', 'asc')
+				->paginate(5);
+		//return response()->json($users);
+
+		// $users = User::orderBy('id', 'asc')->paginate(10);
+		//dd(request('query'));	// http://laravel-vue/api/users/search?query=dima&page=1
+		//dd($users[0]);
 		return $users;
 //		return User::all()->sortBy("id")->map(function($user){
 //			return [
@@ -80,12 +94,12 @@ class UserController extends Controller
 		return response()->json(['success' => true]);
 	}
 
-	public function search() {
-		$searchQuery = request('query');
-		// $users = User::where('name', 'like', "%{$searchQuery}%")->get();
-		$users = User::where('name', 'like', "%{$searchQuery}%")->paginate(3);
-		return response()->json($users);
-	}
+//	public function search() {
+//		$searchQuery = request('query');
+//		// $users = User::where('name', 'like', "%{$searchQuery}%")->get();
+//		$users = User::where('name', 'like', "%{$searchQuery}%")->paginate(3);
+//		return response()->json($users);
+//	}
 
 	public function bulkDelete() {
 //		dd(request('ids'));

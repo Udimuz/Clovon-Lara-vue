@@ -17,7 +17,7 @@ class AppointmentsController extends Controller
 			})
 			//->latest()
 			->orderBy('id', 'desc')
-			->paginate(20)
+			->paginate(5)
 			// Для преобразования (форматирования) данных добавили такую конструкцию:
 			->through(fn ($appoinment) => [
 				'id' => $appoinment->id,

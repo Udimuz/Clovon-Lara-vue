@@ -1,7 +1,9 @@
 <script setup>
+import axios from "axios";
 	import { onMounted, ref, computed } from 'vue';
 	import Swal from 'sweetalert2';
 	import { useToastr } from "@/toastr";
+	import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 
 	const toastr = useToastr();
 
@@ -44,27 +46,36 @@
 
 	const deleteAppointment = (id) => {
 		Swal.fire({
-			title: 'Are you sure?',
-			text: "You won't be able to revert this!",
-			icon: 'warning',
-			showCancelButton: true,
-			confirmButtonColor: '#3085d6',
-			cancelButtonColor: '#d33',
-			confirmButtonText: 'Yes, delete it!'
+			title: 'Are you sure?', text: "You won't be able to revert this!", icon: 'warning',
+			showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, delete it!'
 		}).then((result) => {
 			if (result.isConfirmed) {
 				axios.delete(`/api/appointments/${id}`)
-					.then((response) => {
+					.then(() => {
 						appointments.value.data = appointments.value.data.filter(appointment => appointment.id !== id)
+						getAppointmentStatus();
 						Swal.fire('Deleted!','Your file has been deleted.','success')
 					});
 			}
 		})
 	};
 
+	const navAppointments = (page = 1) => {
+		const params = {page: page};
+		if (typeof selectedStatus.value !== 'undefined')
+			params.status = selectedStatus.value;
+		axios.get('/api/appointments', {
+				params: params
+		})
+				.then((response) => {
+					appointments.value = response.data;
+				})
+	};
+
 	onMounted(() => {
 		getAppointments();
 		getAppointmentStatus();
+		//navAppointments();
 		//toastr.info('Open list of Appointments');
 	});
 </script>
@@ -160,6 +171,7 @@
 					</div>
 				</div>
 			</div>
+			<Bootstrap4Pagination :data="appointments" @pagination-change-page="navAppointments"/>
 		</div>
 	</div>
 
